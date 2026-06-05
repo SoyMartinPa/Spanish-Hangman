@@ -1,16 +1,16 @@
 import json, os, random
 os.chdir(os.path.dirname(__file__))
 ABECEDARIO = "qwertyuiopasdfghjklñzxcvbnmáéíóú"
-
+MAX_ERRORES = 10
 
 def normalizar(c):
     return 'a' if c == 'á' else 'e' if c == 'é' else 'i' if c == 'í' else 'o' if c == 'ó' else 'u' if c == 'ú' else c
 
-def valida():
+def valida(usadas):
     global invalido
     print()
-    c= input("  Adivinanza: ").lower()
-    while not (len(c) == 1 and c in ABECEDARIO and c not in invalido):
+    c= input("  Adivinanza: ").lower().strip()
+    while not (len(c) == 1 and c in ABECEDARIO and c not in usadas):
         print("\033[A\033[2K", end="")   # sube 1 línea y la borra
         print("\033[A\033[2K", end="")   # sube otra línea y la borra
         
@@ -31,11 +31,12 @@ with open("spanish.json", "r", encoding="utf-8") as diccionario:
 
 
 invalido = ''
+usadas = ''
 errores = 0
 
 while True:
     real = (random.choice(data)).lower()
-    if len(real)>=7: break
+    if len(real)>=4: break
 
 palabra = ''.join((normalizar(x) for x in real))
 tabla = ['_' for i in range(len(real))]
@@ -43,6 +44,7 @@ lineas = ''
 
 
 for i in range(len(real)): lineas+=tabla[i]+ ' '
+
 
 clear()
 
@@ -63,7 +65,7 @@ while True:
         break    
 
     print()
-    caracter = valida()
+    caracter = valida(usadas)
     if caracter in palabra: 
         for i,x in enumerate(real):
             v = normalizar(x)
@@ -72,8 +74,8 @@ while True:
 
     else: 
         errores+=1
-
-    invalido += caracter
+        invalido += caracter
+    usadas += caracter
 
     lineas = ''
     for i in range(len(real)): lineas+=tabla[i]+ ' '
