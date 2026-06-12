@@ -1,6 +1,7 @@
 import pygame, random, subprocess, os
 from sys import exit
 import json, os, random
+
 os.chdir(os.path.dirname(__file__))
 ABECEDARIO = "qwertyuiopasdfghjklñzxcvbnmáéíóú"
 MAX_ERRORES = 10
@@ -128,20 +129,20 @@ contador = 10
 running = True
 
 def game_over(random_letra):
+    global running
     clear()
     print("GAME OVER!\n")
     print(f"La letra correcta era {random_letra}")
     print("el emoji murio, rip")
-    global running
     running = False
 
 def intento_correcto(letra):
     global contador
+    global running
     contador = 11
     clear()
     print(f"{letra} es la letra correcta!")
     print("el emoji sobrevivio, yippiee")
-    global running
     running = False
 
 def intento_fallido(letra,random_letra):
@@ -431,13 +432,13 @@ while True:
 
     if contador >= 10:
         screen.blit(unodos_surface, (10,40))
-    elif contador <= 9 and contador >= 8:
+    elif 8<= contador <= 9:
         screen.blit(trescuatro_surface, (10,40))
-    elif contador <= 7 and contador >= 5:
+    elif 5<=contador <= 7:
         screen.blit(cincoseis_surface, (10,40))
-    elif contador <= 4 and contador >= 3:
+    elif 3<= contador <= 4:
         screen.blit(sieteocho_surface, (10,40))
-    elif contador <= 2 and contador >= 0:
+    elif 0<= contador <= 2:
         screen.blit(nuevediez_surface, (10,40))
     else:
         screen.blit(once_surface, (10,40))
