@@ -359,7 +359,7 @@ while True:
                 print("La m fue oprimida")
                 revisa_letra("m",letra)
 
-    font_texto = pygame.font.Font(None,36)
+    font_texto = pygame.font.Font(None,40)
     if contador == 11:
         texto = f'Has ganado!! letra: {letra}'
     elif contador > 0 and contador <= 10:
@@ -370,59 +370,18 @@ while True:
         texto = "GAME OVER!"
     text_surface = font_texto.render(texto, True, 'black')
     screen.blit(text_surface,(80,300))
-    real = "aaaaaaaa"
     # ENTRE 4 Y 14 LETRAS
-    if len(real) == 4:
-        screen.blit(cuadrado_surface, (500-3-25-6-50,350))
-        #text_surface = font_texto.render(real[0], True, 'black')
+    text_surface = font_texto.render(real[0], True, 'black')
         #screen.blit(text_surface,(500-25*3-3*2,350))
-        screen.blit(cuadrado_surface, (500-3-25,350))
-        screen.blit(cuadrado_surface, (500+3+25,350))
-        screen.blit(cuadrado_surface, (500+3+25+50+6,350))
-    elif len(real) == 5:
-        screen.blit(cuadrado_surface, (475-50*2-6*2,350))
-        screen.blit(cuadrado_surface, (475-50*1-6*1,350))
-        screen.blit(cuadrado_surface, (475-50*0-6*0,350))
-        screen.blit(cuadrado_surface, (475+50*1+6*1,350))
-        screen.blit(cuadrado_surface, (475+50*2+6*2,350))
-    elif len(real) == 6:
-        screen.blit(cuadrado_surface, (500-3-25-6*2-50*2,350))
-        screen.blit(cuadrado_surface, (500-3-25-6-50,350))
-        screen.blit(cuadrado_surface, (500-3-25,350))
-        screen.blit(cuadrado_surface, (500+3+25,350))
-        screen.blit(cuadrado_surface, (500+3+25+50+6,350))
-        screen.blit(cuadrado_surface, (500+3+25+6*2+50*2,350))
-    elif len(real) == 7:
-        screen.blit(cuadrado_surface, (475-50*3-6*3,350))
-        screen.blit(cuadrado_surface, (475-50*2-6*2,350))
-        screen.blit(cuadrado_surface, (475-50*1-6*1,350))
-        screen.blit(cuadrado_surface, (475-50*0-6*0,350))
-        screen.blit(cuadrado_surface, (475+50*1+6*1,350))
-        screen.blit(cuadrado_surface, (475+50*2+6*2,350))
-        screen.blit(cuadrado_surface, (475+50*3+6*3,350))
-    elif len(real) == 8:
-        screen.blit(cuadrado_surface, (500-3-25-6*3-50*3,350))
-        screen.blit(cuadrado_surface, (500-3-25-6*2-50*2,350))
-        screen.blit(cuadrado_surface, (500-3-25-6-50,350))
-        screen.blit(cuadrado_surface, (500-3-25,350))
-        screen.blit(cuadrado_surface, (500+3+25,350))
-        screen.blit(cuadrado_surface, (500+3+25+50+6,350))
-        screen.blit(cuadrado_surface, (500+3+25+6*2+50*2,350))
-        screen.blit(cuadrado_surface, (500+3+25+6*3+50*3,350))
-    elif len(real) == 9:
-        screen.blit(cuadrado_surface, (475,350))
-    elif len(real) == 10:
-        screen.blit(cuadrado_surface, (475,350))
-    elif len(real) == 11:
-        screen.blit(cuadrado_surface, (475,350))
-    elif len(real) == 12:
-        screen.blit(cuadrado_surface, (475,350))
-    elif len(real) == 13:
-        screen.blit(cuadrado_surface, (475,350))
-    elif len(real) == 14:
-        screen.blit(cuadrado_surface, (475,350))
+    for i in range(len(real)):
+        if len(real) % 2 == 0:
+            posicion = (500 + 28*(2*i - len(real) + 1), 350)
+        else:
+            posicion = (475 + 56*(i - len(real) // 2), 350)
         
-        
+        screen.blit(cuadrado_surface, posicion)
+        text_surface = font_texto.render(real[i].upper(), True, 'navyblue')
+        screen.blit(text_surface,(posicion[0] + 16, posicion[1] + 12))
 
     screen.blit(titulo_surface, (380,0))
 
