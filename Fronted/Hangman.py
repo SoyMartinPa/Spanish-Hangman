@@ -36,6 +36,8 @@ nuevediez_surface = pygame.transform.scale(nuevediez_surface, (250,250))
 once_surface = pygame.image.load('graficos/once.png')
 once_surface = pygame.transform.scale(once_surface, (250,250))
 
+font_texto = pygame.font.Font(None,40)
+
 # Area de CLicks 1
 rect_q = pygame.Rect(0,0,55.4,50)
 rect_w = pygame.Rect(55.4,0,55.4,50)
@@ -170,6 +172,9 @@ def clear():
 
 # funcion para revisar si la letra seleccionada es igual a la letra random
 def revisa_letra(player_letra:str, random_letra:str):
+    #### FUNCION DE PRUEBA DEL EQUIPO DEL FRONTEND, POR FAVOR BORRAR CUANDO TENGAN LA IMPLEMENTACION REAL DEL BACKEND xoxoxo
+    valida_random()
+    #######################
     if player_letra == random_letra:
         intento_correcto(player_letra)
     else:
@@ -261,8 +266,33 @@ print("Adivina la letra!\n")
 # CHEAT para testear xd
 # print(f"la letra correcta es {letra}")
 
+########## FUNCION DE TEST DEL FRONTEND, BORRAR CUANDO SE AGREGUE LA IMPLEMENTACION OFICIAL CON EL EQUIPO DEL BACKEND (con cariño, el equipo del frontend)
+lista_de_letras_descubiertas = [] # esta lista comienza vacia y ira agregando las letras de la palabra descubiertas por el jugador
+def valida_random():
+    if random.randint(1,10) <= 5:
+        lista_de_letras_descubiertas.append(random.choice(palabra)) # agrega una letra random de la palabra a la lista de letras descubiertas
+
 while True:
     screen.fill('white')
+
+
+    # nota frontend: cambiamos la variable 'real' por la variable 'palabra'
+    for i in range(len(palabra)):
+        if len(palabra) % 2 == 0:
+            posicion = (500 + 28*(2*i - len(palabra) + 1), 350)
+        else:
+            posicion = (475 + 56*(i - len(palabra) // 2), 350)
+
+        if palabra[i] in lista_de_letras_descubiertas:
+            color = "navyblue"
+        else:
+            color = "white"
+    
+        screen.blit(cuadrado_surface, posicion)
+        text_surface = font_texto.render(palabra[i].upper(), True, color)
+        screen.blit(text_surface,(posicion[0] + 16, posicion[1] + 12))
+    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -359,7 +389,7 @@ while True:
                 print("La m fue oprimida")
                 revisa_letra("m",letra)
 
-    font_texto = pygame.font.Font(None,40)
+
     if contador == 11:
         texto = f'Has ganado!! letra: {letra}'
     elif contador > 0 and contador <= 10:
@@ -370,21 +400,8 @@ while True:
         texto = "GAME OVER!"
     text_surface = font_texto.render(texto, True, 'black')
     screen.blit(text_surface,(80,300))
-    # ENTRE 4 Y 14 LETRAS
-    text_surface = font_texto.render(real[0], True, 'black')
-        #screen.blit(text_surface,(500-25*3-3*2,350))
-    for i in range(len(real)):
-        if len(real) % 2 == 0:
-            posicion = (500 + 28*(2*i - len(real) + 1), 350)
-        else:
-            posicion = (475 + 56*(i - len(real) // 2), 350)
-        
-        screen.blit(cuadrado_surface, posicion)
-        text_surface = font_texto.render(real[i].upper(), True, 'navyblue')
-        screen.blit(text_surface,(posicion[0] + 16, posicion[1] + 12))
 
     screen.blit(titulo_surface, (380,0))
-
     screen.blit(teclado_1_surface, (330, 130))
     screen.blit(teclado_2_surface, (330, 200))
     screen.blit(teclado_3_surface, (415, 270))
