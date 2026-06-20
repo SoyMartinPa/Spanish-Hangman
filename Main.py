@@ -1,11 +1,6 @@
 import pygame, random, subprocess, os, json, time
-#Constantes--------------------------------------------------
 os.chdir(os.path.dirname(__file__))
-
-
-
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
+#Constantes-------------------------------------------------- START
 
 LETRAS_VALIDAS = "qwertyuiopasdfghjklñzxcvbnmáéíóú"
 MAX_ERRORES = 10
@@ -76,8 +71,10 @@ MODO_DE_JUEGO = r"""
  ╚════╝  ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ 
 
 """
-#Constantes--------------------------------------------------
+#Constantes-------------------------------------------------- END
 
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def archivos():
     with open("spanish.json", "r", encoding="utf-8") as f:  
@@ -353,14 +350,14 @@ def consola():
                 print(AGREGAR_PALABRAS)
                 if palabras_agregadas: print(f"\nSet actual: {palabras_agregadas}")
                 if flag == 1: print("Palabra invalida\n\n")
-                elif flag == 2: print("La palabra debe estar entre 3 a 12 caracteres\n\n")
+                elif flag == 2: print("La palabra debe estar entre 3 a 14 caracteres\n\n")
                 elif flag == 0: print("Palabra agregada con exito!\n\n") 
                 else: print()
 
 
                 nueva = input("Ingrese la nueva palabra: ").strip()
                 if not all(c.lower() in LETRAS_VALIDAS for c in nueva): flag = 1
-                elif not (3<=len(nueva)<=12): flag = 2
+                elif not (3<=len(nueva)<=14): flag = 2
                 else:
                     palabras_agregadas.add(nueva.capitalize())
                     flag = 0
