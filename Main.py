@@ -320,8 +320,10 @@ def consola():
             print("3) Intrucciones")
             print("4) Salir")
             while not (1<=pantalla<=4):
-                pantalla = int(input("Opción: "))
-
+                try:
+                    pantalla = int(input("Opción: "))
+                    if not (1 <= pantalla <= 4): print("\033[A\033[2K", end="")
+                except ValueError: print("\033[A\033[2K", end="")
 
         elif pantalla == 1:
             clear()
@@ -332,7 +334,10 @@ def consola():
             print("3) Ambos")
             print("4) Atras")
             while not (10<=pantalla<=40):
-                pantalla = (int(input("Opción: ")))*10
+                try:
+                    pantalla = int(input("Opción: ")) * 10
+                    if not (10 <= pantalla <= 40): print("\033[A\033[2K", end="")
+                except ValueError: print("\033[A\033[2K", end="")
 
             if pantalla == 10: flag_set = 1
             elif pantalla == 20 and palabras_agregadas: flag_set = 2
@@ -378,7 +383,10 @@ def consola():
             print("2) Jugar con interfaz gráfica")
             print("3) Atras")
             while not (1<=pantalla<=3):
-                pantalla = int(input("Opción: "))
+                try:
+                    pantalla = int(input("Opción: "))
+                    if not (1 <= pantalla <= 3): print("\033[A\033[2K", end="")
+                except ValueError: print("\033[A\033[2K", end="")
             
             if pantalla == 1: return flag_set, palabras_agregadas, 1
             if pantalla == 2: return flag_set, palabras_agregadas, 2
