@@ -31,7 +31,8 @@ AGREGAR_PALABRAS = """
 ║  • Solo letras del alfabeto (sin números ni símbolos)    ║
 ║  • Entre 3 y 12 caracteres                               ║
 ║  • Deja en blanco y presiona Enter para terminar         ║
-╚══════════════════════════════════════════════════════════╝"""
+╚══════════════════════════════════════════════════════════╝
+"""
 TITULO = r"""
  ██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗
  ██║  ██║██╔══██╗████╗  ██║██╔════╝ ████╗ ████║██╔══██╗████╗  ██║
@@ -121,7 +122,7 @@ def valida(usadas,etapas,errores,tabla): # Función que valida que la letra del 
             print(f"Error: '{c}' no es una letra válida del abecedario.") # Imprimir error
             continue
         cn = normalizar(c) # Primero normaliza la letra (saca la tilde). 
-        if cn in usadas: 
+        if cn in usadas: # ¿Qué ocurre si la letra ya fue ingresada anteriormente?
             imprimir(etapas,errores,tabla)
             print(f"Error: la letra '{c}' ya fue ingresada antes.") # luego revisa si fue usada antes, en caso de ser así muestra error.
             continue
@@ -181,39 +182,133 @@ def terminal(flag_set,palabras_agregadas):
         else:
             errores += 1
             incorrectas.append(caracter)
+
+# Pygame clases
+class Button:
+    def __init__(self, text, width, height, pos, elevation, letra, font):
+        # core attributes
+        self.pressed = False
+        self.elevation = elevation
+        self.dynamic_elevation = elevation
+        self.original_y_pos = pos[1]
+        self.letra = letra
+
+        # top rectangle
+        self.top_rect = pygame.Rect(pos,(width,height))
+        self.top_color = "#FFFFFF"
+
+        # outline rectangle
+        self.outline_top_rect_outer = pygame.Rect(pos,(width, height))
+        self.outline_top_rect_inner = pygame.Rect(pos,(width-4, height-4))
+
+        # bottom rectangle
+        self.bottom_rect = pygame.Rect(pos,(width,elevation))
+        self.bottom_color = "gray38"
+
+        # text
+        self.text_surf = font.render(text,True,'#000c54')
+        self.text_rect = self.text_surf.get_rect(center = self.top_rect.center)
+        
+        # shadow text
+        self.shadow_text_surf = font.render(text,True,'#7B7B7B')
+        self.shadow_text_rect = self.shadow_text_surf.get_rect(center = self.top_rect.center)
+        self.shadow_offset = 1
+
+    def draw(self, screen, activo, usadas):
+        # color when already used
+        if self.letra in usadas:
+            self.top_color = "#A8A8A8"
+        # elevation logic
+        self.top_rect.y = self.original_y_pos - self.dynamic_elevation
+        self.text_rect.center = self.top_rect.center
+        self.shadow_text_rect.center = self.top_rect.center
+        self.outline_top_rect_inner.center = self.top_rect.center
+        self.outline_top_rect_outer.center = self.top_rect.center
+
+        self.bottom_rect.midtop = self.top_rect.midtop
+        self.bottom_rect.height = self.top_rect.height + self.dynamic_elevation
+
+
+        self.bottom_surf = pygame.Surface(pygame.Rect(self.bottom_rect).size, pygame.SRCALPHA)
+        pygame.draw.rect(self.bottom_surf, (0,0,0,140), self.bottom_surf.get_rect(), border_radius = 10)
+        screen.blit(self.bottom_surf, self.bottom_rect)
+
+        #pygame.draw.rect(screen, self.bottom_color, self.bottom_rect, border_radius=12)
+        pygame.draw.rect(screen,self.top_color,self.top_rect,border_radius=12)
+        pygame.draw.rect(screen, '#000c54', self.outline_top_rect_outer, width=1, border_radius=12)
+        pygame.draw.rect(screen, '#000c54', self.outline_top_rect_inner, width=1, border_radius=10)
+        screen.blit(self.shadow_text_surf,(self.shadow_text_rect.x+self.shadow_offset,self.shadow_text_rect.y+self.shadow_offset))
+        screen.blit(self.text_surf,self.text_rect)
+        if not activo:
+            self.dynamic_elevation = self.elevation
+            self.top_color = '#FFFFFF'
+        else:
+            self.check_click()
+
+    def check_click(self):
+        global letra_seleccionada
+        mouse_pos = pygame.mouse.get_pos()
+        # el mouse esta por encima del boton
+        if self.top_rect.collidepoint(mouse_pos):
+            self.top_color = "#4BA1D7"
+            self.shadow_text_surf
+            # el boton fue presionado, se esta esperando a que se suelte
+            if pygame.mouse.get_pressed()[0]:
+                self.dynamic_elevation = 0
+                self.pressed = True
+            # el boton no esta siendo presionado
+            else:
+                self.dynamic_elevation = self.elevation
+                # el boton fue presionado, enviar señal 
+                if self.pressed == True:
+                    letra_seleccionada = self.letra
+                    self.pressed = False
+        # el mouse no esta por encima del boton
+        else:
+            self.dynamic_elevation = self.elevation
+            self.top_color = "#FFFFFF"
+
 #Pygame funciones ------------------------------------------- START
 def cargar_assets():
     def escalar(path):
         return pygame.transform.scale(pygame.image.load(path), (250, 250))
+    def translucido(path):
+        path.set_alpha(150)
+        return path
+    
+    fondo_texto = pygame.Surface((155,40))
+    fondo_texto.fill("black")
+
+
+    # este es un diccionario
     return {
         "cuadrado":   pygame.image.load('graficos/cuadrado.png'),
         "titulo":     pygame.image.load('graficos/logoB.png'),
         "fondo":      pygame.image.load('graficos/FONDO.png'),
-        "teclado_1":  pygame.image.load('graficos/newFIRST.png'),
-        "teclado_2":  pygame.image.load('graficos/newSECOND.png'),
-        "teclado_3":  pygame.image.load('graficos/newTHIRD.png'),
         "unodos":     escalar('graficos/newunodos.png'),
         "trescuatro": escalar('graficos/newtrescuatro.png'),
         "cincoseis":  escalar('graficos/newcincoseis.png'),
         "sieteocho":  escalar('graficos/newsieteocho.png'),
         "nuevediez":  escalar('graficos/newnuevediez.png'),
         "once":       escalar('graficos/newonce.png'),
+        "happy":      escalar('graficos/happyhappy.png'),
+        "texto":      translucido(fondo_texto)
     }
 
-def cargar_rects():
+def cargar_rects(font_botones):
     fila1  = "qwertyuiop"
     fila2  = "asdfghjklñ"
     fila3  = "zxcvbnm"
-    ancho1 = 55.4
-    ancho3 = 386 / 7
+
     rects  = {}
-    for i, l in enumerate(fila1): rects[l] = pygame.Rect(ancho1*i, 0, ancho1, 50).move(330, 130)
-    for i, l in enumerate(fila2): rects[l] = pygame.Rect(ancho1*i, 0, ancho1, 50).move(330, 200)
-    for i, l in enumerate(fila3): rects[l] = pygame.Rect(ancho3*i, 0, ancho3, 50).move(415, 270)
+    for i, l in enumerate(fila1): rects[l] = Button(l, 50, 50, (330 + 56*i, 130), 6, l, font_botones)
+    for i, l in enumerate(fila2): rects[l] = Button(l, 50, 50, (330 + 56*i, 200), 6, l, font_botones)
+    for i, l in enumerate(fila3): rects[l] = Button(l, 50, 50, (415 + 56*i, 270), 6, l, font_botones)
     return rects
 
 def imagen_etapa(assets, errores):
-    if errores <= 2:   return assets["unodos"]
+    if   errores < 0:  return assets["happy"]
+    elif errores <= 2: return assets["unodos"]
     elif errores <= 4: return assets["trescuatro"]
     elif errores <= 6: return assets["cincoseis"]
     elif errores <= 8: return assets["sieteocho"]
@@ -221,7 +316,7 @@ def imagen_etapa(assets, errores):
     else:              return assets["once"]
 
 def hangman_pygame(flag_set, palabras_agregadas):
-
+    global letra_seleccionada
     pygame.init()
     screen = pygame.display.set_mode((1000, 450))
     pygame.display.set_caption("Hangman")
@@ -232,44 +327,62 @@ def hangman_pygame(flag_set, palabras_agregadas):
     data,etapas = archivos()
 
     assets = cargar_assets()
-    rects = cargar_rects()
 
     real, palabra_norm = palabra_azar(data, flag_set , palabras_agregadas)
     tabla = ['_'] * len(real)
     usadas = set()
     font = pygame.font.Font(None, 40)
-    texto = ""
+    texto = "Intentos: 10"
     errores = 0
+    rects = cargar_rects(font)
+    letra_seleccionada = ""
+    continuar = Button("Continuar",150,40,(100,350), 6, "continuar", font)
+    salir = Button("Salir",150,40,(100,400), 6, "salir", font)
+
+    # elemento para que el primer click del programa funcione correctamente
+    window = pygame.Window.from_display_module()
+    window.focus() 
 
     while True:
         screen.fill('white')
         screen.blit(assets["fondo"], (0, 0))
+
+        if not activo:
+            continuar.draw(screen,True,usadas)
+            salir.draw(screen,True,usadas)
+            if letra_seleccionada == "continuar":
+                hangman_pygame(flag_set, palabras_agregadas)
+            elif letra_seleccionada == "salir":
+                pygame.quit()
+                exit()
+
+        for boton in rects.values():
+            boton.draw(screen, activo, usadas)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and activo:
-                for letra, rect in rects.items():
-                    if rect.collidepoint(event.pos) and letra not in usadas:
-                        usadas.add(letra)
-
-                        if letra in palabra_norm:
-                            for i, x in enumerate(real):
-                                if normalizar(x) == letra:
-                                    tabla[i] = x
-                            if '_' not in tabla:
-                                texto   = "¡Has ganado!!"
-                                activo = False
-                        else:
-                            errores += 1
-                            if errores >= MAX_ERRORES:
-                                texto   = f"Palabra: {real.capitalize()}"
-                                activo = False
-                            else:
-                                texto = f"Intentos: {MAX_ERRORES - errores}"
-                        break
+        if activo and letra_seleccionada != "":
+            if letra_seleccionada not in usadas:
+                usadas.add(letra_seleccionada)
+                if letra_seleccionada in palabra_norm:
+                    for i, x in enumerate(real):
+                        if normalizar(x) == letra_seleccionada:
+                            tabla[i] = x
+                    if '_' not in tabla:
+                        texto   = "¡Has ganado!"
+                        errores = -1 # permite agregar al emoji feliz tras finalizar el juego con una victoria.
+                        activo = False
+                else:
+                    errores += 1
+                    if errores >= MAX_ERRORES:
+                        texto   = f"Palabra: {real.capitalize()}"
+                        activo = False
+                    else:
+                        texto = f"Intentos: {MAX_ERRORES - errores}"
+            letra_seleccionada = ""
 
         n = len(palabra_norm)
         for i, c in enumerate(palabra_norm):
@@ -290,13 +403,20 @@ def hangman_pygame(flag_set, palabras_agregadas):
             screen.blit(font.render(letra, True, color_sombra), (posicion[0]+14, posicion[1]+14))
             screen.blit(font.render(letra, True, color),        (posicion[0]+16, posicion[1]+12))
 
+        texto_surface = font.render(texto, True, 'black')
 
-        screen.blit(font.render(texto, True, 'black'), (63, 303)) #Esto la sombra del texto
-        screen.blit(font.render(texto, True, 'white'), (60, 300)) #Esto es el texto
+        
+        texto_rect = texto_surface.get_rect(topleft=(60, 300))
+        fondo_rect = texto_rect.inflate(15, 15)
+        fondo_surf = pygame.Surface(pygame.Rect(fondo_rect).size, pygame.SRCALPHA)
+        pygame.draw.rect(fondo_surf, (0,0,0,140), fondo_surf.get_rect(), border_radius = 10)
+        screen.blit(fondo_surf, fondo_rect)
+
+
+        screen.blit(font.render(texto, True, 'black'), (62,304)) #Esto es la sombra del texto.
+        screen.blit(font.render(texto, True, 'white'), (60,302)) #Esto es el texto.
+        
         screen.blit(assets["titulo"],    (380, 0))
-        screen.blit(assets["teclado_1"], (330, 130))
-        screen.blit(assets["teclado_2"], (330, 200))
-        screen.blit(assets["teclado_3"], (415, 270))
         screen.blit(imagen_etapa(assets,errores),      (10,  40))
 
         pygame.display.update()
@@ -320,10 +440,8 @@ def consola():
             print("3) Intrucciones")
             print("4) Salir")
             while not (1<=pantalla<=4):
-                try:
-                    pantalla = int(input("Opción: "))
-                    if not (1 <= pantalla <= 4): print("\033[A\033[2K", end="")
-                except ValueError: print("\033[A\033[2K", end="")
+                pantalla = int(input("Opción: "))
+
 
         elif pantalla == 1:
             clear()
@@ -334,10 +452,7 @@ def consola():
             print("3) Ambos")
             print("4) Atras")
             while not (10<=pantalla<=40):
-                try:
-                    pantalla = int(input("Opción: ")) * 10
-                    if not (10 <= pantalla <= 40): print("\033[A\033[2K", end="")
-                except ValueError: print("\033[A\033[2K", end="")
+                pantalla = (int(input("Opción: ")))*10
 
             if pantalla == 10: flag_set = 1
             elif pantalla == 20 and palabras_agregadas: flag_set = 2
@@ -383,10 +498,7 @@ def consola():
             print("2) Jugar con interfaz gráfica")
             print("3) Atras")
             while not (1<=pantalla<=3):
-                try:
-                    pantalla = int(input("Opción: "))
-                    if not (1 <= pantalla <= 3): print("\033[A\033[2K", end="")
-                except ValueError: print("\033[A\033[2K", end="")
+                pantalla = int(input("Opción: "))
             
             if pantalla == 1: return flag_set, palabras_agregadas, 1
             if pantalla == 2: return flag_set, palabras_agregadas, 2
